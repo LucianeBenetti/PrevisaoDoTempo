@@ -1,5 +1,6 @@
 package com.example.previsaodotempo.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Previsao {
@@ -62,6 +63,7 @@ public class Previsao {
 
     @Override
     public String toString() {
-        return "data=" + data;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(data);
     }
 }

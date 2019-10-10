@@ -1,7 +1,9 @@
 package com.example.previsaodotempo.control;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -9,16 +11,21 @@ import android.widget.Toast;
 
 import com.example.previsaodotempo.R;
 import com.example.previsaodotempo.model.ConsultaCidade;
+import com.example.previsaodotempo.model.ConsultaCidadeDTO;
 import com.example.previsaodotempo.model.Previsao;
 import com.example.previsaodotempo.model.PrevisaoDTO;
 import com.example.previsaodotempo.model.Resultado;
 import com.example.previsaodotempo.model.ResultadoDTO;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,14 +43,13 @@ public class MainControl {
     private List<Previsao> listPrevisoes;
     private ArrayAdapter<Previsao> adapterPrevisao;
     private Previsao previsao;
-    private Resultado resultado;
+
 
     public MainControl(Activity activity) {
         this.activity = activity;
         previsao = new Previsao();
-        resultado = new Resultado();
         initComponents();
-        pesquisarPorResultado();
+
     }
 
     private void initComponents() {
@@ -53,21 +59,11 @@ public class MainControl {
         tvMinimo = activity.findViewById(R.id.tvMinimo);
         tvMaximo = activity.findViewById(R.id.tvMaximo);
         lvPrevisoes = activity.findViewById(R.id.lvPrevisoes);
-
-        configListView();
-
-    }
-
-    private void configListView() {
-
-        listPrevisoes = new ArrayList<>();
-        listPrevisoes.add(new Previsao());
-        adapterPrevisao = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, listPrevisoes);
-        lvPrevisoes.setAdapter(adapterPrevisao);
+        pesquisarPorResultado();
     }
 
 
-    private void pesquisarPorResultado(){
+    public void pesquisarPorResultado(){
         AsyncHttpClient client = new AsyncHttpClient();
         client.get("https://api.hgbrasil.com/weather/", new AsyncHttpResponseHandler() {
             @Override
@@ -80,13 +76,20 @@ public class MainControl {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 //retorno em string do viacep em Json
+
                 String resultadoJason = new String(bytes);
                 //conversao da string json para objeto
                 Gson gson = new Gson();
                 //conversao direta
-                ResultadoDTO eDTO = gson.fromJson(resultadoJason, ResultadoDTO.class);
-                Resultado resultado = eDTO.getResultado();
+                JsonElement root = new JsonParser().parse(resultadoJason);
+                ResultadoDTO rDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), ResultadoDTO.class);
+                Resultado resultado = rDTO.getResultado();
+
+                PrevisaoDTO pDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), PrevisaoDTO.class);
+                Previsao previsao = pDTO.getPrevisao();
+//                adapterPrevisao.add(previsao);
                 carregarForm(resultado);
+                configListView(previsao);
 
             }
 
@@ -98,14 +101,47 @@ public class MainControl {
     }
 
 
+    public void configListView(Previsao p) {
+
+        listPrevisoes = new ArrayList<>();
+        listPrevisoes.add(p);
+        adapterPrevisao = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, listPrevisoes);
+        lvPrevisoes.setAdapter(adapterPrevisao);
+        Toast.makeText(activity, "Carregando", Toast.LENGTH_SHORT).show();
+        cliqueCurto();
+    }
+
+
+    private void cliqueCurto() {
+        lvPrevisoes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Previsao p = adapterPrevisao.getItem(i);
+
+                carregaListViewPrevisão(p);
+            }
+        });
+    }
+
+    private void carregaListViewPrevisão(Previsao p) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        tvData.setText("Data: " + sdf.format(p.getData()));
+
+        tvMinimo.setText(String.valueOf(p.getTemperaturaMinima()));
+        tvMaximo.setText(String.valueOf(p.getTemperaturaMaxima()));
+    }
+
     private void limparDados() {
     }
 
     private void carregarForm(Resultado r) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        tvCidade.setText(r.getCidade());
-        tvData.setText(r.getData().getDate());
-        tvUmidade.setText(r.getUmidade());
+        tvCidade.setText("Cidade: " + r.getCidade());
+        tvData.setText("Data: " +  sdf.format(r.getData()));
+        tvUmidade.setText(r.getUmidade() + "%");
+        tvMaximo.setText("-/-");
+        tvMinimo.setText("-/-");
     }
 
 }

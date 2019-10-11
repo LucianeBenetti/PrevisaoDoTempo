@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class PrevisaoDTO {
 
@@ -68,6 +69,7 @@ public class PrevisaoDTO {
 
     public Previsao getPrevisao(){
         SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
+
         Date data = null;
         try {
             data = formatador.parse(date);

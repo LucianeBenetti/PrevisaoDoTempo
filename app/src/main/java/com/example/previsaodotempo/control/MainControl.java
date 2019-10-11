@@ -80,16 +80,16 @@ public class MainControl {
                 //conversao direta
                 JsonElement root = new JsonParser().parse(resultadoJason);
                 JsonElement forecasts = root.getAsJsonObject().get("results");
-                String fore = forecasts.getAsJsonObject().get("forecast").toString();
+                String forecast = forecasts.getAsJsonObject().get("forecast").toString();
+
                 ResultadoDTO rDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), ResultadoDTO.class);
                 Resultado resultado = rDTO.getResultado();
+                PrevisaoDTO[] pDTO = gson.fromJson(forecast, PrevisaoDTO[].class);
 
-               PrevisaoDTO[] pDTO = gson.fromJson(fore, PrevisaoDTO[].class);
-
-          //      Previsao previsao = pDTO.getPrevisao();
+               //PrevisaoDTO dto = gson.fromJson(forecast, PrevisaoDTO.class);
+               //Previsao previsao = dto.getPrevisao();
                 carregarForm(resultado);
                 configListView();
-
                 adapterPrevisao.addAll(Arrays.asList(pDTO));
 
             }

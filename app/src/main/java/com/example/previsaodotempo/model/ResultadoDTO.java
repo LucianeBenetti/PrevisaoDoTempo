@@ -11,18 +11,10 @@ public class ResultadoDTO {
     private Integer temp;
     private String city;
     private String date;
-    private Previsao [] forecast;
+    private List<Previsao> forecast;
     private Integer humidity;
 
     public ResultadoDTO() {
-    }
-
-    public ResultadoDTO(Integer temp, String city, String date, Previsao [] forecast, Integer humidity) {
-        this.temp = temp;
-        this.city = city;
-        this.date = date;
-        this.forecast = forecast;
-        this.humidity = humidity;
     }
 
     public Integer getHumidity() {
@@ -57,11 +49,19 @@ public class ResultadoDTO {
         this.date = date;
     }
 
-    public Previsao[] getForecast() {
+    public ResultadoDTO(Integer temp, String city, String date, List<Previsao> forecast, Integer humidity) {
+        this.temp = temp;
+        this.city = city;
+        this.date = date;
+        this.forecast = forecast;
+        this.humidity = humidity;
+    }
+
+    public List<Previsao> getForecast() {
         return forecast;
     }
 
-    public void setForecast(Previsao [] forecast) {
+    public void setForecast(List<Previsao> forecast) {
         this.forecast = forecast;
     }
 

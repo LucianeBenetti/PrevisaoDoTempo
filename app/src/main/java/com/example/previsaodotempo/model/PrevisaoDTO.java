@@ -84,6 +84,11 @@ public class PrevisaoDTO {
         return p;
     }
 
-
+    @Override
+    public String toString() {
+       // SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+       // return sdf.format(date);
+        return date;
+    }
 }
 

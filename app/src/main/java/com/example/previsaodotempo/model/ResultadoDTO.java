@@ -2,6 +2,7 @@ package com.example.previsaodotempo.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -10,13 +11,13 @@ public class ResultadoDTO {
     private Integer temp;
     private String city;
     private String date;
-    private List<Previsao> forecast;
+    private Previsao [] forecast;
     private Integer humidity;
 
     public ResultadoDTO() {
     }
 
-    public ResultadoDTO(Integer temp, String city, String date, List<Previsao> forecast, Integer humidity) {
+    public ResultadoDTO(Integer temp, String city, String date, Previsao [] forecast, Integer humidity) {
         this.temp = temp;
         this.city = city;
         this.date = date;
@@ -56,11 +57,11 @@ public class ResultadoDTO {
         this.date = date;
     }
 
-    public List<Previsao> getForecast() {
+    public Previsao[] getForecast() {
         return forecast;
     }
 
-    public void setForecast(List<Previsao> forecast) {
+    public void setForecast(Previsao [] forecast) {
         this.forecast = forecast;
     }
 
@@ -88,4 +89,6 @@ public class ResultadoDTO {
         }
 
     }
+
+
 }

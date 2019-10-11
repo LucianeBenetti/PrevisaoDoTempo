@@ -10,8 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.previsaodotempo.R;
-import com.example.previsaodotempo.model.ConsultaCidade;
-import com.example.previsaodotempo.model.ConsultaCidadeDTO;
 import com.example.previsaodotempo.model.Previsao;
 import com.example.previsaodotempo.model.PrevisaoDTO;
 import com.example.previsaodotempo.model.Resultado;
@@ -19,7 +17,6 @@ import com.example.previsaodotempo.model.ResultadoDTO;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -40,14 +37,14 @@ public class MainControl {
     private TextView tvMinimo;
     private TextView tvMaximo;
     private ListView lvPrevisoes;
-    private List<Previsao> listPrevisoes;
-    private ArrayAdapter<Previsao> adapterPrevisao;
-    private Previsao previsao;
+    private List<PrevisaoDTO> listPrevisoes;
+    private ArrayAdapter<PrevisaoDTO> adapterPrevisao;
+    private PrevisaoDTO previsao;
 
 
     public MainControl(Activity activity) {
         this.activity = activity;
-        previsao = new Previsao();
+        previsao = new PrevisaoDTO();
         initComponents();
 
     }
@@ -82,14 +79,18 @@ public class MainControl {
                 Gson gson = new Gson();
                 //conversao direta
                 JsonElement root = new JsonParser().parse(resultadoJason);
+                JsonElement forecasts = root.getAsJsonObject().get("results");
+                String fore = forecasts.getAsJsonObject().get("forecast").toString();
                 ResultadoDTO rDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), ResultadoDTO.class);
                 Resultado resultado = rDTO.getResultado();
 
-                PrevisaoDTO pDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), PrevisaoDTO.class);
-                Previsao previsao = pDTO.getPrevisao();
-//                adapterPrevisao.add(previsao);
+               PrevisaoDTO[] pDTO = gson.fromJson(fore, PrevisaoDTO[].class);
+
+          //      Previsao previsao = pDTO.getPrevisao();
                 carregarForm(resultado);
-                configListView(previsao);
+                configListView();
+
+                adapterPrevisao.addAll(Arrays.asList(pDTO));
 
             }
 
@@ -101,10 +102,9 @@ public class MainControl {
     }
 
 
-    public void configListView(Previsao p) {
+    public void configListView() {
 
         listPrevisoes = new ArrayList<>();
-        listPrevisoes.add(p);
         adapterPrevisao = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, listPrevisoes);
         lvPrevisoes.setAdapter(adapterPrevisao);
         Toast.makeText(activity, "Carregando", Toast.LENGTH_SHORT).show();
@@ -116,19 +116,19 @@ public class MainControl {
         lvPrevisoes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Previsao p = adapterPrevisao.getItem(i);
+                PrevisaoDTO p = adapterPrevisao.getItem(i);
 
                 carregaListViewPrevisão(p);
             }
         });
     }
 
-    private void carregaListViewPrevisão(Previsao p) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        tvData.setText("Data: " + sdf.format(p.getData()));
-
-        tvMinimo.setText(String.valueOf(p.getTemperaturaMinima()));
-        tvMaximo.setText(String.valueOf(p.getTemperaturaMaxima()));
+    private void carregaListViewPrevisão(PrevisaoDTO p) {
+   //     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    //    tvData.setText("Data: " + sdf.format(p.getDate()));
+        tvData.setText("Data: " + p.getDate());
+        tvMinimo.setText(String.valueOf(p.getMin()));
+        tvMaximo.setText(String.valueOf(p.getMax()));
     }
 
     private void limparDados() {

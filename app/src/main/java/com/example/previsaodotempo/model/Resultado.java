@@ -9,12 +9,12 @@ public class Resultado {
     private String cidade;
     private Date data;
     private Integer Umidade;
-    private List<Previsao> previsao;
+    private Previsao[] previsao;
 
     public Resultado() {
     }
 
-    public Resultado(Integer temperatura, String cidade, Date data, Integer umidade, List<Previsao> previsao) {
+    public Resultado(Integer temperatura, String cidade, Date data, Integer umidade, Previsao[] previsao) {
         this.temperatura = temperatura;
         this.cidade = cidade;
         this.data = data;
@@ -54,11 +54,11 @@ public class Resultado {
         this.data = data;
     }
 
-    public List<Previsao> getPrevisao() {
+    public Previsao[] getPrevisao() {
         return previsao;
     }
 
-    public void setPrevisao(List<Previsao> previsao) {
+    public void setPrevisao(Previsao[] previsao) {
         this.previsao = previsao;
     }
 }

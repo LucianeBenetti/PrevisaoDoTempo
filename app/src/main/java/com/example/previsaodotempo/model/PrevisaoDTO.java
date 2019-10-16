@@ -68,17 +68,17 @@ public class PrevisaoDTO {
     }
 
     public Previsao getPrevisao(){
-        SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
-
-        Date data = null;
-        try {
-            data = formatador.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
+//
+//        Date data = null;
+//        try {
+//            data = formatador.parse(date);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
 
         Previsao p = new Previsao();
-        p.setData(data);
+        p.setData(date);
         p.setTemperaturaMaxima(max);
         p.setTemperaturaMinima(min);
         p.setDescricao(description);
@@ -88,9 +88,9 @@ public class PrevisaoDTO {
 
     @Override
     public String toString() {
-       // SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-       // return sdf.format(date);
-        return date;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(date);
+      //  return date;
     }
 }
 

@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Previsao {
-    private Date data;
+    private String data;
     private Integer temperaturaMaxima;
     private Integer temperaturaMinima;
     private String descricao;
@@ -13,7 +13,7 @@ public class Previsao {
     public Previsao() {
     }
 
-    public Previsao(Date data, Integer temperaturaMaxima, Integer temperaturaMinima, String descricao, String condicao) {
+    public Previsao(String data, Integer temperaturaMaxima, Integer temperaturaMinima, String descricao, String condicao) {
         this.data = data;
         this.temperaturaMaxima = temperaturaMaxima;
         this.temperaturaMinima = temperaturaMinima;
@@ -21,11 +21,11 @@ public class Previsao {
         this.condicao = condicao;
     }
 
-    public Date getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(Date data) {
+    public void setData(String data) {
         this.data = data;
     }
 
@@ -63,7 +63,7 @@ public class Previsao {
 
     @Override
     public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        return sdf.format(data);
+
+        return data;
     }
 }

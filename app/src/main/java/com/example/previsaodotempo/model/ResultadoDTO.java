@@ -2,6 +2,7 @@ package com.example.previsaodotempo.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ public class ResultadoDTO {
     private Integer temp;
     private String city;
     private String date;
-    private List<Previsao> forecast;
+    private List<PrevisaoDTO> forecast;
     private Integer humidity;
 
     public ResultadoDTO() {
@@ -49,7 +50,7 @@ public class ResultadoDTO {
         this.date = date;
     }
 
-    public ResultadoDTO(Integer temp, String city, String date, List<Previsao> forecast, Integer humidity) {
+    public ResultadoDTO(Integer temp, String city, String date, List<PrevisaoDTO> forecast, Integer humidity) {
         this.temp = temp;
         this.city = city;
         this.date = date;
@@ -57,23 +58,26 @@ public class ResultadoDTO {
         this.humidity = humidity;
     }
 
-    public List<Previsao> getForecast() {
+    public List<PrevisaoDTO> getForecast() {
         return forecast;
     }
 
-    public void setForecast(List<Previsao> forecast) {
+    public void setForecast(List<PrevisaoDTO> forecast) {
         this.forecast = forecast;
     }
 
     public Resultado getResultado(){
         Resultado r = new Resultado();
 
-        Date data = converteData(date);
-        r.setData(data);
+      //  Date data = converteData(date);
+        r.setData(date);
         r.setCidade(city);
-        r.setPrevisao(forecast);
         r.setTemperatura(temp);
         r.setUmidade(humidity);
+        r.setPrevisao(new ArrayList<Previsao>());
+        for(PrevisaoDTO pDTO : forecast){
+            r.getPrevisao().add(pDTO.getPrevisao());
+        }
 
         return r;
     }

@@ -2,28 +2,26 @@ package com.example.previsaodotempo.control;
 
 import android.app.Activity;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.previsaodotempo.R;
 import com.example.previsaodotempo.model.Previsao;
 import com.example.previsaodotempo.model.PrevisaoDTO;
 import com.example.previsaodotempo.model.Resultado;
 import com.example.previsaodotempo.model.ResultadoDTO;
+import com.example.previsaodotempo.model.Tempo;
+import com.example.previsaodotempo.model.TempoDTO;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -38,15 +36,11 @@ public class MainControl {
     private TextView tvMaximo;
     private ListView lvPrevisoes;
     private List<PrevisaoDTO> listPrevisoes;
-    private ArrayAdapter<PrevisaoDTO> adapterPrevisao;
-    private PrevisaoDTO previsao;
-
+    private ArrayAdapter<Previsao> adapterPrevisao;
 
     public MainControl(Activity activity) {
         this.activity = activity;
-        previsao = new PrevisaoDTO();
         initComponents();
-
     }
 
     private void initComponents() {
@@ -59,89 +53,95 @@ public class MainControl {
         pesquisarPorResultado();
     }
 
-
-    public void pesquisarPorResultado(){
+    private void pesquisarPorResultado(){
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("https://api.hgbrasil.com/weather/", new AsyncHttpResponseHandler() {
+       // String URL = ;
+        client.get("https://api.hgbrasil.com/weather?woeid=455861", new AsyncHttpResponseHandler() {
             @Override
             public void onStart() {
                 super.onStart();
                 Toast.makeText(activity, "Iniciou", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onRetry(int retryNO) {
+                super.onRetry(retryNO);
+                Toast.makeText(activity, "Tentativa" + retryNO, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 //retorno em string do viacep em Json
-
                 String resultadoJason = new String(bytes);
                 //conversao da string json para objeto
                 Gson gson = new Gson();
-                //conversao direta
-                JsonElement root = new JsonParser().parse(resultadoJason);
-                JsonElement forecasts = root.getAsJsonObject().get("results");
-                String forecast = forecasts.getAsJsonObject().get("forecast").toString();
+                TempoDTO tDTO = gson.fromJson(resultadoJason, TempoDTO.class);
+                Tempo t = tDTO.getTempo();
+                carregarForm(t);
 
-                ResultadoDTO rDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), ResultadoDTO.class);
-                Resultado resultado = rDTO.getResultado();
-                PrevisaoDTO[] pDTO = gson.fromJson(forecast, PrevisaoDTO[].class);
+//
+//                JsonElement root = new JsonParser().parse(resultadoJason);
+//                JsonElement forecasts = root.getAsJsonObject().get("results");
+//                String forecast = forecasts.getAsJsonObject().get("forecast").toString();
+//
+//                ResultadoDTO rDTO = gson.fromJson(root.getAsJsonObject().get("results").toString(), ResultadoDTO.class);
+//                Resultado resultado = rDTO.getResultado();
+//                PrevisaoDTO[] pDTO = gson.fromJson(forecast, PrevisaoDTO[].class);
 
-               //PrevisaoDTO dto = gson.fromJson(forecast, PrevisaoDTO.class);
+//                //Transforma a resposta em uma lista de objetos Categoria
+//                Type previsoesListType = new TypeToken<ArrayList<PrevisaoDTO>>(){}.getType();
+//                List<PrevisaoDTO> listPrevisoes = gson.fromJson(resultadoJason, previsoesListType);
+//
+//                adapterPrevisao.addAll(listPrevisoes); //Adicionando dentro de algum Adapter
+//               PrevisaoDTO dto = gson.fromJson(forecast, PrevisaoDTO.class);
                //Previsao previsao = dto.getPrevisao();
-                carregarForm(resultado);
-                configListView();
-                adapterPrevisao.addAll(Arrays.asList(pDTO));
 
+                configListView(t);
+               // adapterPrevisao.addAll(Arrays.asList(pDTO));
             }
 
             @Override
             public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
-                limparDados();
+                Toast.makeText(activity, "Falhou", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    public void configListView(Tempo t) {
 
-    public void configListView() {
-
-        listPrevisoes = new ArrayList<>();
-        adapterPrevisao = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, listPrevisoes);
+        adapterPrevisao = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, t.getResultado().getPrevisao());
         lvPrevisoes.setAdapter(adapterPrevisao);
         Toast.makeText(activity, "Carregando", Toast.LENGTH_SHORT).show();
         cliqueCurto();
     }
 
-
     private void cliqueCurto() {
         lvPrevisoes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                PrevisaoDTO p = adapterPrevisao.getItem(i);
-
+                Previsao p = adapterPrevisao.getItem(i);
                 carregaListViewPrevisão(p);
             }
         });
     }
 
-    private void carregaListViewPrevisão(PrevisaoDTO p) {
-   //     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    //    tvData.setText("Data: " + sdf.format(p.getDate()));
-        tvData.setText("Data: " + p.getDate());
-        tvMinimo.setText(String.valueOf(p.getMin()));
-        tvMaximo.setText(String.valueOf(p.getMax()));
+    private void carregaListViewPrevisão(Previsao p) {
+
+        tvData.setText("Data: " + p.getData());
+        tvMinimo.setText(String.valueOf(p.getTemperaturaMinima()));
+        tvMaximo.setText(String.valueOf(p.getTemperaturaMaxima()));
     }
 
     private void limparDados() {
     }
 
-    private void carregarForm(Resultado r) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    private void carregarForm(Tempo t) {
 
-        tvCidade.setText("Cidade: " + r.getCidade());
-        tvData.setText("Data: " +  sdf.format(r.getData()));
-        tvUmidade.setText(r.getUmidade() + "%");
+
+        tvCidade.setText("Cidade: " + t.getResultado().getCidade());
+        tvData.setText("Data: " +  t.getResultado().getData());
+        tvUmidade.setText(t.getResultado().getUmidade() + "%");
         tvMaximo.setText("-/-");
         tvMinimo.setText("-/-");
     }
-
 }

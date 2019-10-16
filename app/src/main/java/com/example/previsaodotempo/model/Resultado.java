@@ -7,14 +7,14 @@ public class Resultado {
 
     private Integer temperatura;
     private String cidade;
-    private Date data;
+    private String data;
     private Integer Umidade;
     private List<Previsao> previsao;
 
     public Resultado() {
     }
 
-    public Resultado(Integer temperatura, String cidade, Date data, Integer umidade, List<Previsao> previsao) {
+    public Resultado(Integer temperatura, String cidade, String data, Integer umidade, List<Previsao> previsao) {
         this.temperatura = temperatura;
         this.cidade = cidade;
         this.data = data;
@@ -50,11 +50,11 @@ public class Resultado {
         this.cidade = cidade;
     }
 
-    public Date getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(Date data) {
+    public void setData(String data) {
         this.data = data;
     }
 
